@@ -109,14 +109,28 @@ class ParseContext {
 	}
 }
 
+/**
+ * Custom error class for SRT syntax errors.
+ */
 export class SrtSyntaxError extends Error {
 	ctx: ParseContext;
+
+	/**
+	 * Creates a new SrtSyntaxError instance.
+	 * @param info - Error description
+	 * @param ctx - The parsing context where the error occurred
+	 */
 	constructor(info: string, ctx: ParseContext) {
 		super(info);
 		this.ctx = ctx.clone();
 		this.name = 'SrtSyntaxError';
 		this.message = `${info}\n${this.format()}`;
 	}
+
+	/**
+	 * Formats the error message with context information.
+	 * @returns A formatted error message string
+	 */
 	format(): string {
 		let result = '';
 
@@ -126,6 +140,7 @@ export class SrtSyntaxError extends Error {
 		for (const [i, line] of lines.entries()) {
 			lineId = i;
 			if (accumulatedLength + line.length > this.ctx.pos) {
+				// Found the line containing the error position
 				break;
 			}
 			// line length and 1 for '\n'
