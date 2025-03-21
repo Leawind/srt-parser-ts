@@ -20,7 +20,7 @@ This project provides a parser for SubRip Text (SRT) files, which are commonly u
 You can parse an SRT file using the `SubRipText.parse` method:
 
 ```typescript
-import { SubRipText } from './src/index';
+import { SubRipText } from '@leawind/srt-parser';
 
 // Example SRT content
 const srtContent = `
@@ -47,7 +47,7 @@ srt.nodes.forEach((node) => {
 You can create and manipulate subtitle nodes using the `SrtNode` class:
 
 ```typescript
-import { SrtNode } from './src/index';
+import { SrtNode } from '@leawind/srt-parser';
 
 // Create a new subtitle node
 const node = new SrtNode(1, 1000, 4000, 'Hello, world!');
@@ -64,7 +64,7 @@ console.log(node.toString());
 The parser provides detailed error messages when encountering invalid SRT content:
 
 ```typescript
-import { SrtSyntaxError, SubRipText } from './src/index';
+import { SrtSyntaxError, SubRipText } from '@leawind/srt-parser';
 
 try {
 	const srt = SubRipText.parse('Invalid SRT content');
