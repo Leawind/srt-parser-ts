@@ -2,9 +2,13 @@
 	"name": "@leawind/srt-parser",
 	"version": "0.1.4",
 	"license": "GPLv3",
-	"exports": "./src/index.ts",
+	"exports": {
+		"./internal": "./src/index-internal.ts",
+		".": "./src/index.ts"
+	},
 	"tasks": {
-		"dev": "deno test --watch --parallel",
+		"test": "deno test -A",
+		"dev": "deno test -A --watch --parallel",
 		"prepare": "deno fmt && deno lint && deno test -A"
 	},
 	"test": {
@@ -13,6 +17,7 @@
 		]
 	},
 	"imports": {
+		"@leawind/inventory": "jsr:@leawind/inventory@^0.11.2",
 		"@std": "jsr:@std",
 		"@/": "./src/"
 	},

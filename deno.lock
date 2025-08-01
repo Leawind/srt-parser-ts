@@ -1,18 +1,46 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
+    "jsr:@leawind/delegate@0.6": "0.6.0",
+    "jsr:@leawind/inventory@~0.11.2": "0.11.2",
     "jsr:@std/assert@*": "1.0.11",
-    "jsr:@std/internal@^1.0.5": "1.0.5"
+    "jsr:@std/internal@^1.0.5": "1.0.5",
+    "jsr:@std/internal@^1.0.9": "1.0.9",
+    "jsr:@std/path@1": "1.1.1"
   },
   "jsr": {
+    "@leawind/delegate@0.6.0": {
+      "integrity": "37b5638a8ba0393d40f16f8cfc1788dff3b597bdb3251633d5893c9c366f3e24"
+    },
+    "@leawind/inventory@0.11.2": {
+      "integrity": "ccbff629552d17633f8ffbe1ad1bec8ef5513c48343a3ae0a6d4739309b16e0b",
+      "dependencies": [
+        "jsr:@leawind/delegate",
+        "jsr:@std/path"
+      ]
+    },
     "@std/assert@1.0.11": {
       "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1",
       "dependencies": [
-        "jsr:@std/internal"
+        "jsr:@std/internal@^1.0.5"
       ]
     },
     "@std/internal@1.0.5": {
       "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
+    },
+    "@std/internal@1.0.9": {
+      "integrity": "bdfb97f83e4db7a13e8faab26fb1958d1b80cc64366501af78a0aee151696eb8"
+    },
+    "@std/path@1.1.1": {
+      "integrity": "fe00026bd3a7e6a27f73709b83c607798be40e20c81dde655ce34052fd82ec76",
+      "dependencies": [
+        "jsr:@std/internal@^1.0.9"
+      ]
     }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@leawind/inventory@~0.11.2"
+    ]
   }
 }
