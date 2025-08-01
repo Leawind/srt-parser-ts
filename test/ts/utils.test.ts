@@ -67,3 +67,10 @@ Deno.test('parseTimeToMs should throw error for invalid format', () => {
 	assertThrows(() => parseTimeToMs('1'));
 	assertThrows(() => parseTimeToMs('1:'));
 });
+
+Deno.test('cross test', () => {
+	const limit = parseTimeToMs('29:23:59:59.999');
+	for (let ms = -limit; ms <= limit; ms += 8191) {
+		assertStrictEquals(parseTimeToMs(stringifyMsToTime(ms)), ms);
+	}
+});
