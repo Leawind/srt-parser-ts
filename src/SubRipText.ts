@@ -40,6 +40,13 @@ export class SubRipText {
 	}
 
 	/**
+	 * Save as srt file
+	 */
+	public saveFile(path: string): void {
+		Deno.writeTextFileSync(path, this.toString());
+	}
+
+	/**
 	 * Convert the SubRipText object to a string representation.
 	 * @returns A string containing the full SubRip text content.
 	 */
