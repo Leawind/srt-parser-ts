@@ -46,14 +46,12 @@ export class SubRipText {
 	): ThisType<SubRipText> {
 		type SortedMappings = (readonly [number, number])[];
 
-		const sortedMappings: SortedMappings = Object.entries(mappings).map(
-			(
-				[key, value],
-			) => [
+		const sortedMappings: SortedMappings = Object.entries(mappings)
+			.map(([key, value]) => ([
 				/^\d+$/.test(key) ? ~~key : parseTimeToMs(key),
 				typeof value === 'number' ? value : parseTimeToMs(value),
-			] as const,
-		).sort((a, b) => a[0] - b[0]);
+			] as const))
+			.sort((a, b) => a[0] - b[0]);
 
 		this.nodes.forEach((x) => {
 			x.appear = map(x.appear, sortedMappings);
@@ -61,24 +59,28 @@ export class SubRipText {
 		});
 
 		function map(ms: number, mappings: SortedMappings): number {
+			let min: readonly [number, number];
+			let max: readonly [number, number];
+
 			switch (mappings.length) {
 				case 0:
 					return ms;
 				case 1:
 					return mappings[0][1] + (ms - mappings[0][0]);
 				case 2: {
-					const [min, max] = mappings;
-					return min[1] + (max[1] - min[1]) / (max[0] - min[0]) *
-							(ms - min[0]);
+					[min, max] = mappings;
+					break;
 				}
 				default: {
 					let minId = 0;
 					let maxId = mappings.length - 1;
 
 					if (ms < mappings[minId][0]) {
-						return mappings[minId][1];
+						min = mappings[minId];
+						max = mappings[minId + 1];
 					} else if (ms > mappings[maxId][0]) {
-						return mappings[maxId][1];
+						min = mappings[maxId - 1];
+						max = mappings[maxId];
 					} else {
 						while (maxId - minId > 1) {
 							const mid = Math.floor((minId + maxId) / 2);
@@ -88,13 +90,22 @@ export class SubRipText {
 								minId = mid;
 							}
 						}
-						const min = mappings[minId];
-						const max = mappings[maxId];
-						return min[1] + (max[1] - min[1]) / (max[0] - min[0]) *
-								(ms - min[0]);
+						min = mappings[minId];
+						max = mappings[maxId];
 					}
 				}
 			}
+			return interpolate(ms, min[0], min[1], max[0], max[1]);
+		}
+
+		function interpolate(
+			x: number,
+			x1: number,
+			y1: number,
+			x2: number,
+			y2: number,
+		): number {
+			return (x - x1) * (y2 - y1) / (x2 - x1) + y1;
 		}
 
 		return this;

@@ -1,4 +1,9 @@
-import { assert, assertStrictEquals, assertThrows } from '@std/assert';
+import {
+	assert,
+	assertAlmostEquals,
+	assertStrictEquals,
+	assertThrows,
+} from '@std/assert';
 import { SRM } from '../test-utils.ts';
 import { SubRipText } from '@/SubRipText.ts';
 import { SrtSyntaxError } from '@/error.ts';
@@ -136,4 +141,100 @@ Deno.test('should get nodes at specific time', () => {
 	// At 8000ms, no subtitles are displayed
 	nodes = srt.getNodesAt(8000);
 	assertStrictEquals(nodes.length, 0);
+});
+
+Deno.test('should map time with empty mapping', () => {
+	const srt = new SubRipText();
+	const node = new SrtNode(1, 1000, 2000, 'Subtitle');
+	srt.nodes.push(node);
+
+	// Map time with empty mapping - should not change anything
+	srt.mapTime({});
+
+	assertStrictEquals(node.appear, 1000);
+	assertStrictEquals(node.disappear, 2000);
+});
+
+Deno.test('should map time with single mapping point', () => {
+	const srt = new SubRipText();
+	const node = new SrtNode(1, 1000, 2000, 'Subtitle');
+	srt.nodes.push(node);
+
+	// Map time with single point: 3000ms -> 5000ms
+	srt.mapTime({ 3000: 5000 });
+
+	// With single mapping point, all times are shifted by the same offset
+	// Offset: 5000 - 3000 = 2000ms
+	assertStrictEquals(node.appear, 3000); // 1000 + 2000
+	assertStrictEquals(node.disappear, 4000); // 2000 + 2000
+});
+
+Deno.test('should map time with simple linear mapping', () => {
+	const srt = new SubRipText();
+	const node1 = new SrtNode(1, 1000, 2000, 'First subtitle');
+	const node2 = new SrtNode(2, 3000, 4000, 'Second subtitle');
+	srt.nodes.push(node1, node2);
+
+	// A simple shift of +1000ms
+	srt.mapTime({ 0: 1000, 5000: 6000 });
+
+	assertStrictEquals(node1.appear, 2000); // 1000 + 1000
+	assertStrictEquals(node1.disappear, 3000); // 2000 + 1000
+	assertStrictEquals(node2.appear, 4000); // 3000 + 1000
+	assertStrictEquals(node2.disappear, 5000); // 4000 + 1000
+});
+
+Deno.test('should map time with complex mapping', () => {
+	const srt = new SubRipText();
+	const node1 = new SrtNode(1, 1000, 2000, 'First subtitle');
+	const node2 = new SrtNode(2, 3000, 4000, 'Second subtitle');
+	const node3 = new SrtNode(3, 5000, 6000, 'Third subtitle');
+	const node4 = new SrtNode(4, 9000, 12000, 'Third subtitle');
+	srt.nodes.push(node1, node2, node3, node4);
+
+	// Map time with complex transformation:
+	// 0ms -> 0ms, 3000ms -> 4000ms, 6000ms -> 12000ms
+	srt.mapTime({
+		0: 0,
+		3000: 4000,
+		6000: 12000,
+	});
+
+	// Node1: appear at 1000ms -> ~1333ms, disappear at 2000ms -> ~2667ms
+	assertAlmostEquals(node1.appear, 1333, 1);
+	assertAlmostEquals(node1.disappear, 2667, 1);
+
+	// Node2: appear at 3000ms -> 4000ms, disappear at 4000ms -> ~6667ms
+	assertAlmostEquals(node2.appear, 4000, 1);
+	assertAlmostEquals(node2.disappear, 6667, 1);
+
+	// Node3: appear at 5000ms -> ~9333ms, disappear at 6000ms -> 12000ms
+	assertAlmostEquals(node3.appear, 9333, 1);
+	assertAlmostEquals(node3.disappear, 12000, 1);
+
+	// Node4: appear at 9000ms -> ~11667ms, disappear at 12000ms -> 16000ms
+	assertAlmostEquals(node4.appear, 20000, 1);
+	assertAlmostEquals(node4.disappear, 28000, 1);
+});
+
+Deno.test('should map time with string format', () => {
+	const srt = new SubRipText();
+	const node1 = new SrtNode(1, 1000, 2000, 'First subtitle');
+	const node2 = new SrtNode(2, 3000, 4000, 'Second subtitle');
+	srt.nodes.push(node1, node2);
+
+	// Map time using string format
+	srt.mapTime({
+		'00:00:01,000': '00:00:02,000', // 1000ms -> 2000ms
+		'00:00:04,000': '00:00:05,000', // 4000ms -> 5000ms
+	});
+
+	// Linear interpolation:
+	// Node1: appear at 1000ms -> 2000ms, disappear at 2000ms -> 3000ms
+	assertStrictEquals(node1.appear, 2000);
+	assertStrictEquals(node1.disappear, 3000);
+
+	// Node2: appear at 3000ms -> 4000ms, disappear at 4000ms -> 5000ms
+	assertStrictEquals(node2.appear, 4000);
+	assertStrictEquals(node2.disappear, 5000);
 });
