@@ -1,6 +1,6 @@
 {
 	"name": "@leawind/srt-parser",
-	"version": "0.1.4",
+	"version": "0.2.0",
 	"license": "GPLv3",
 	"exports": {
 		"./internal": "./src/index-internal.ts",
