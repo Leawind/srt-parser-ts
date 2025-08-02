@@ -117,23 +117,23 @@ Deno.test('should get nodes at specific time', () => {
 	const node3 = new SrtNode(3, 5000, 7000, 'Third subtitle');
 	srt.nodes.push(node1, node2, node3);
 
-	// 在1500ms时，只有第一个字幕显示
+	// At 1500ms, only the first subtitle is displayed
 	let nodes = srt.getNodesAt(1500);
 	assertStrictEquals(nodes.length, 1);
 	assertStrictEquals(nodes[0], node1);
 
-	// 在2500ms时，第一个和第二个字幕同时显示
+	// At 2500ms, both first and second subtitles are displayed
 	nodes = srt.getNodesAt(2500);
 	assertStrictEquals(nodes.length, 2);
-	assertStrictEquals(nodes[0], node1); // id较小的排在前面
+	assertStrictEquals(nodes[0], node1); // Nodes with smaller IDs come first
 	assertStrictEquals(nodes[1], node2);
 
-	// 在6000ms时，只有第三个字幕显示
+	// At 6000ms, only the third subtitle is displayed
 	nodes = srt.getNodesAt(6000);
 	assertStrictEquals(nodes.length, 1);
 	assertStrictEquals(nodes[0], node3);
 
-	// 在8000ms时，没有字幕显示
+	// At 8000ms, no subtitles are displayed
 	nodes = srt.getNodesAt(8000);
 	assertStrictEquals(nodes.length, 0);
 });
