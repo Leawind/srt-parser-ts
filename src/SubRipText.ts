@@ -27,9 +27,9 @@ export class SubRipText {
 	/**
 	 * Shift all subtitles in this _srt_ by a specified time offset.
 	 */
-	public shiftTime(timeOffset: string): void;
-	public shiftTime(timeOffset: number): void;
-	public shiftTime(timeOffset: string | number): void {
+	public shiftTime(timeOffset: string): ThisType<SubRipText>;
+	public shiftTime(timeOffset: number): ThisType<SubRipText>;
+	public shiftTime(timeOffset: string | number): ThisType<SubRipText> {
 		const time = typeof timeOffset === 'string'
 			? parseTimeToMs(timeOffset)
 			: timeOffset;
@@ -37,6 +37,8 @@ export class SubRipText {
 			x.appear += time;
 			x.disappear += time;
 		});
+
+		return this;
 	}
 
 	/**
